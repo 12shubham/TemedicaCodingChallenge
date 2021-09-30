@@ -9,6 +9,6 @@ import java.util.List;
 
 @Repository
 public interface DrugRepository extends JpaRepository<Drug, String> {
-    @Query(value = "SELECT * FROM DRUG WHERE NAME LIKE '%:1%' OR DISEASE LIKE '%:1%'", nativeQuery = true)
+    @Query(value = "SELECT * FROM DRUGS D INNER JOIN DRUG_DISEASES DI ON D.ID=DI.DRUG_ID WHERE LOWER(D.NAME) LIKE %?1% OR LOWER(DI.DISEASES) LIKE %?1%", nativeQuery = true)
     public List<Drug> findDrugs(String drugOrDisease);
 }

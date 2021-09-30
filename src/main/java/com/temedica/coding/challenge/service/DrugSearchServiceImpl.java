@@ -15,7 +15,7 @@ public class DrugSearchServiceImpl implements DrugSearchService{
 
     @Override
     public List<Drug> getRelevantDrugs(String drugOrDisease) {
-        return drugRepository.findDrugs(drugOrDisease);
+        return drugRepository.findDrugs(drugOrDisease.toLowerCase());
     }
 
     @Override
