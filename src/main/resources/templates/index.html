@@ -31,10 +31,14 @@
   user-select: none;
   cursor: pointer;
 }
-.clearable input::-ms-clear {  /* Remove IE default X */
+.clearable input::-ms-clear {
   display: none;
 }
 
+.descriptionHere{
+  border: 1px solid;
+  box-shadow: 10px 10px 10px #888888;
+}
 </style>
 <body style="font-family: 'Roboto Slab', serif;">
 <div class="container">
@@ -81,14 +85,13 @@ function search_func(value)
         success: function(msg){
         $("#panelCollection").empty();
             var emp = jQuery.parseJSON(msg);
-            console.log(emp.length);
             $('#numResults').text(emp.length);
             if(emp.length>0){
                 $('#allResults').css("display", "block");
                 for(var i=0; i<emp.length; i++){
-                var panel = "<div class='panel panel-default'><div class='panel-body'><div class='row'><div class='col-md-6'><p id='drugName' style='font-weight:700; font-size:25px;'>"+emp[i].name+"</p></div><div class='col-md-6'><p style='float:right; font-size:18px; font-weight:500'>Released on <span id='released' style='font-weight:700'>"+emp[i].varDateString+"</span></p></div></div><div class='row'><div class='col-md-12'><p style='font-size:18px'><span style='font-weight:700'>Related diseases: </span><span id='diseases'>"+emp[i].varDiseases+"</span></p></div></div><div class='row'><div class='col-md-12'><p style='font-size:18px'><span style='font-weight:700'>Description: </span><span id='description'>"+emp[i].varDisplayDescription+"</span></p></div></div></div></div>";
+                var panel = "<div class='panel panel-default descriptionHere'><div class='panel-body'><div class='row'><div class='col-md-6'><p id='drugName' style='font-weight:700; font-size:25px;'>"+emp[i].name+"</p></div><div class='col-md-6'><p style='float:right; font-size:18px; font-weight:500'>Released on <span id='released' style='font-weight:700'>"+emp[i].varDateString+"</span></p></div></div><div class='row'><div class='col-md-12'><p style='font-size:18px'><span style='font-weight:700'>Related diseases: </span><span id='diseases'>"+emp[i].varDiseases+"</span></p></div></div><div class='row'><div class='col-md-12'><p style='font-size:18px'><span style='font-weight:700'>Description: </span><span id='description'>"+emp[i].varDisplayDescription+"</span></p></div></div></div></div>";
                 $('#panelCollection').append(panel);
-               }
+                }
             }else{
                 $('#allResults').css("display", "none");
             }
