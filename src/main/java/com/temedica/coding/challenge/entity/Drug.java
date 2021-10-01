@@ -25,6 +25,9 @@ public class Drug {
     private String name;
     private LocalDate released;
     @Transient
-    @JsonIgnore
-    private String dateString;
+    private String varDateString;
+    @Transient
+    private String varDisplayDescription;
+    @Transient
+    private String varDiseases;
 }

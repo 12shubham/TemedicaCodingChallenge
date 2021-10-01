@@ -1,6 +1,7 @@
 package com.temedica.coding.challenge.controller;
 
 import com.temedica.coding.challenge.entity.Drug;
+import com.temedica.coding.challenge.entity.Drugs;
 import com.temedica.coding.challenge.service.DrugSearchService;
 import lombok.AllArgsConstructor;
 import org.apache.tomcat.util.buf.StringUtils;
@@ -9,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -24,26 +26,28 @@ public class DrugSearchController {
     private final DrugSearchService drugSearchService;
 
     @GetMapping(value = "/search")
-    public String getRelevantDrugs(Model model, @RequestParam("searchstring") String searchstring) throws ParseException {
+    @ResponseBody
+    public List<Drug> getRelevantDrugs(@RequestParam("searchstring") String searchstring) throws ParseException {
+        if(searchstring.isEmpty()) return new ArrayList<>();
         List<Drug> relevantDrugs = drugSearchService.getRelevantDrugs(searchstring);
         Set<String> namesAlreadySeen = new HashSet<>();
         relevantDrugs.removeIf(p -> !namesAlreadySeen.add(p.getId()));
         Map<String, String> allDescriptions = new HashMap<>();
         Map<String, String> allDiseases = new HashMap<>();
         for(Drug eachDrug : relevantDrugs){
+            //Descriptiuon processing
             char[] descriptionChars = eachDrug.getDescription();
-            allDescriptions.put(eachDrug.getId(), new String(descriptionChars));
-            allDiseases.put(eachDrug.getId(), String.join(", ", eachDrug.getDiseases()));
+            eachDrug.setVarDisplayDescription(new String(descriptionChars));
+
+            //Diseases processing
+            eachDrug.setVarDiseases(String.join(", ", eachDrug.getDiseases()));
+
+            //Release date processing
             LocalDate date = eachDrug.getReleased();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            eachDrug.setDateString(formatter.format(date));
+            eachDrug.setVarDateString(formatter.format(date));
         }
-        model.addAttribute("allRelevantDrugs", relevantDrugs);
-        model.addAttribute("allDescriptions", allDescriptions);
-        model.addAttribute("allDiseases", allDiseases);
-        model.addAttribute("searchString", searchstring);
-        model.addAttribute("condition", true);
-        return "index";
+        return relevantDrugs;
     }
 
     @GetMapping({"/","","/index.html","/index"})

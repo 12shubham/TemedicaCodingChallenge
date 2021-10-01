@@ -9,50 +9,92 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="icon" th:href="@{/img/logo.png}" type="image/png" sizes="16x16">
     <title>Temedica coding challenge</title>
 </head>
 <style>
+.clearable{
+  position: relative;
+  display: block;
+}
+
+.clearable__clear {
+  font-size: 23px
+}
+
+.clearable__clear{
+  display: none;
+  position: absolute;
+  right:0; top:0;
+  padding: 0 12px;
+  font-style: normal;
+  user-select: none;
+  cursor: pointer;
+}
+.clearable input::-ms-clear {  /* Remove IE default X */
+  display: none;
+}
+
 </style>
 <body style="font-family: 'Roboto Slab', serif;">
 <div class="container">
     <img th:src="@{/img/logo.png}" style="width:80px; height:auto; margin-top:50px"/>
     <h2 style="margin-top:50px">Search</h2>
    <form action="/search" method="get">
-        <div class="input-group">
-            <input type="text" class="form-control" placeholder="You can search by drug name or by disease" name="searchstring" th:value="${searchString}">
-            <div class="input-group-btn">
-                <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
-            </div>
+        <div class="form-group clearable">
+            <input type="text" class="form-control" placeholder="You can search by drug name or by disease" onkeyup="search_func(this.value);" name="searchstring"><i class="clearable__clear">&times</i>
         </div>
     </form>
 </div>
 <br><br>
-<div class="container" th:style="${condition ? 'display:block' : 'display:none'}" >
-    <p style="font-size:20px; font-weight:300">Showing <span th:text="${allRelevantDrugs.size()}"></span> results</p>
-    <div th:each="drug : ${allRelevantDrugs}">
-        <div class="panel panel-default">
-            <div class="panel-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <p th:text="${drug.name}" style="font-weight:700; font-size:25px;"></p>
-                    </div>
-                    <div class="col-md-6">
-                        <p style="float:right; font-size:18px; font-weight:500">Released on <span th:text="${drug.dateString}" style="font-weight:700"></span></p>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <p style="font-size:18px"><span style="font-weight:700">Related diseases: </span><span th:text="${allDiseases.get(drug.id)}"></span></p>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <p style="font-size:18px"><span style="font-weight:700">Description: </span><span th:text="${allDescriptions.get(drug.id)}"></span></p>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="container" style="display:none" id="allResults">
+    <p style="font-size:20px; font-weight:300">Showing <span id="numResults"></span> results</p>
+    <div id="panelCollection">
     </div>
 </div>
+<script>
+    $(".clearable").each(function() {
+  const $inp = $(this).find("input:text"),
+      $cle = $(this).find(".clearable__clear");
+
+  $inp.on("input", function(){
+    $cle.toggle(!!this.value);
+  });
+
+  $cle.on("touchstart click", function(e) {
+    e.preventDefault();
+    $inp.val("").trigger("input");
+     $('#allResults').css("display", "none");
+  });
+
+});
+
+var req = null;
+function search_func(value)
+{
+    if (req != null) req.abort();
+    req = $.ajax({
+        type: "GET",
+        url: "/search",
+        data: {'searchstring' : value},
+        dataType: "text",
+        success: function(msg){
+        $("#panelCollection").empty();
+            var emp = jQuery.parseJSON(msg);
+            console.log(emp.length);
+            $('#numResults').text(emp.length);
+            if(emp.length>0){
+                $('#allResults').css("display", "block");
+                for(var i=0; i<emp.length; i++){
+                var panel = "<div class='panel panel-default'><div class='panel-body'><div class='row'><div class='col-md-6'><p id='drugName' style='font-weight:700; font-size:25px;'>"+emp[i].name+"</p></div><div class='col-md-6'><p style='float:right; font-size:18px; font-weight:500'>Released on <span id='released' style='font-weight:700'>"+emp[i].varDateString+"</span></p></div></div><div class='row'><div class='col-md-12'><p style='font-size:18px'><span style='font-weight:700'>Related diseases: </span><span id='diseases'>"+emp[i].varDiseases+"</span></p></div></div><div class='row'><div class='col-md-12'><p style='font-size:18px'><span style='font-weight:700'>Description: </span><span id='description'>"+emp[i].varDisplayDescription+"</span></p></div></div></div></div>";
+                $('#panelCollection').append(panel);
+               }
+            }else{
+                $('#allResults').css("display", "none");
+            }
+        }
+    });
+}
+</script>
 </body>
 </html>
