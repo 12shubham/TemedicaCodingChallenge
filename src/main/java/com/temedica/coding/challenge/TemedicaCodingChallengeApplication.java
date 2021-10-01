@@ -34,7 +34,7 @@ public class TemedicaCodingChallengeApplication {
 			try {
 				Drugs drugs = mapper.readValue(inputStream, typeReference);
 				drugSearchService.loadAllDrugs(drugs.getDrugs());
-				System.out.println("All Drugs loaded Successfully");
+				System.out.println("All Drugs loaded Successfully. Application started.");
 			} catch (IOException e){
 				System.out.println("Unable to save all Drugs:" + e.getMessage());
 			}
