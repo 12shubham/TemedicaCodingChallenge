@@ -4,10 +4,10 @@ A simple web application to load Medicinal drugs data in an in-memory database a
 
 Quick Start
 ===========
-1) Clone the Git repository.
-2) Open the project in IntelliJ / Eclipse IDE.
+1) Clone the Git repository
+2) Open the project in IntelliJ / Eclipse IDE
 3) Navigate to TemedicaCodingChallengeApplication.java
-4) Right Click on the file and Run as Java Application.
+4) Right Click on the file and Run as Java Application
 
 The application can be accessed at http://localhost:8080/index.html
 
